@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>KD STORE PREMIUM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<style>
+
+
+body{
+margin:0;
+font-family:Poppins;
+background:#0a0a0a;
+color:white;
+scroll-behavior:smooth;
+}
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(40px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes pulse{
+0%{box-shadow:0 0 5px gold;}
+50%{box-shadow:0 0 20px gold;}
+100%{box-shadow:0 0 5px gold;}
+}
+
+/* ================= HEADER ================= */
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 40px;
+background:#000;
+border-bottom:2px solid gold;
+position:sticky;
+top:0;
+z-index:1000;
+animation:fadeIn 0.8s ease-in-out;
+}
+
+.logo{
+font-size:28px;
+font-weight:800;
+color:gold;
+letter-spacing:3px;
+}
+
+.cart-btn{
+background:gold;
+color:black;
+padding:10px 20px;
+border:none;
+font-weight:700;
+border-radius:30px;
+cursor:pointer;
+animation:pulse 2s infinite;
+}
+
+/* ================= COLLAPSIBLE FILTER ================= */
+
+.filter-container{
+text-align:center;
+padding:20px;
+}
+
+.filter-toggle{
+background:gold;
+color:black;
+padding:10px 20px;
+border:none;
+border-radius:30px;
+font-weight:700;
+cursor:pointer;
+}
+
+.filters{
+margin-top:15px;
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+justify-content:center;
+transition:0.4s;
+}
+
+.hidden{
+display:none;
+}
+
+.category-title{
+width:100%;
+font-weight:600;
+margin-top:10px;
+color:gold;
+font-size:14px;
+letter-spacing:1px;
+}
+
+.filters button{
+background:#111;
+color:white;
+border:1px solid gold;
+padding:8px 15px;
+border-radius:20px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.filters button:hover{
+background:gold;
+color:black;
+transform:scale(1.1);
+}
+
+/* ================= PRODUCTS ================= */
+
+.products{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px;
+padding:40px;
+}
+
+.product{
+background:#111;
+padding:20px;
+border-radius:20px;
+transition:0.4s;
+animation:fadeIn 0.6s ease-in-out;
+}
+
+.product:hover{
+transform:translateY(-10px) scale(1.05);
+box-shadow:0 0 25px gold;
+}
+
+.product img{
+width:100%;
+height:220px;
+object-fit:cover;
+border-radius:15px;
+}
+
+button{
+background:gold;
+border:none;
+padding:10px;
+border-radius:20px;
+font-weight:700;
+cursor:pointer;
+width:100%;
+margin-top:8px;
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+/* ================= CART ================= */
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.95);
+overflow:auto;
+padding:40px;
+z-index:2000;
+animation:fadeIn 0.5s ease-in-out;
+}
+
+.modal-content{
+background:#111;
+padding:30px;
+border-radius:20px;
+max-width:600px;
+margin:auto;
+}
+
+input,textarea{
+width:100%;
+padding:10px;
+margin-top:8px;
+border-radius:10px;
+border:none;
+background:#222;
+color:white;
+}
+
+.remove{
+background:red;
+margin-top:5px;
+}
+
+.pay-btn{
+background:limegreen;
+margin-top:15px;
+}
+<!-- checkout.html -->
+<form action="notify.php" method="POST">
+    <input type="hidden" name="order_id" value="12345">
+    <input type="hidden" name="phone" value="+27123456789">
+    <button type="submit">Complete Purchase</button>
+</form>
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+
+<div class="header">
+<div class="logo">KD STORE</div>
+<button class="cart-btn" onclick="openCart()">🛒 <span id="cartCount">0</span></button>
+</div>
+
+<!-- COLLAPSIBLE FILTER -->
+
+<div class="filter-container">
+
+<button class="filter-toggle" onclick="toggleFilters()">
+📂 Categories
+</button>
+
+<div id="filterBox" class="filters hidden">
+
+<button onclick="filterProducts('All')">All</button>
+
+<div class="category-title">👕 Shirts</div>
+<button onclick="filterProducts('Shirts')">Shirts</button>
+
+<div class="category-title">🧥 Tops</div>
+<button onclick="filterProducts('Tops')">Tops</button>
+
+<div class="category-title">👖 Pants</div>
+<button onclick="filterProducts('Pants')">Pants</button>
+
+<div class="category-title">🩳 Shorts</div>
+<button onclick="filterProducts('Shorts')">Shorts</button>
+
+<div class="category-title">🧢 Caps</div>
+<button onclick="filterProducts('Caps')">Caps</button>
+
+<div class="category-title">💎 Accessories</div>
+<button onclick="filterProducts('Accessories')">Accessories</button>
+
+</div>
+</div>
+
+<div id="products" class="products"></div>
+
+<!-- CART -->
+
+<div id="cartModal" class="modal">
+<div class="modal-content">
+
+<h2>Checkout</h2>
+<div id="cartItems"></div>
+
+<h3>Shipping: R70</h3>
+<h3>Total: R<span id="total">0</span></h3>
+
+<hr>
+
+<h3>Delivery Details</h3>
+
+<input type="text" id="name" placeholder="Full Name">
+<input type="text" id="phone" placeholder="Phone Number">
+<textarea id="address" placeholder="Address"></textarea>
+
+<button class="pay-btn" onclick="payNow()">💳 Pay With PayFast</button>
+<button onclick="closeCart()">Close</button>
+
+</div>
+</div>
+
+<script>
+
+/* ================= CART ================= */
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let shipping = 70;
+
+/* ================= EXPANDED PRODUCTS ================= */
+
+let products = [
+
+{name:"Oversized Shirt White",category:"Shirts",price:550,image:"https://via.placeholder.com/300"},
+{name:"Oversized Shirt Black",category:"Shirts",price:550,image:"https://via.placeholder.com/300"},
+{name:"Graphic Street Shirt",category:"Shirts",price:480,image:"https://via.placeholder.com/300"},
+{name:"Minimal Premium Tee",category:"Shirts",price:420,image:"https://via.placeholder.com/300"},
+{name:"Luxury Print Tee",category:"Shirts",price:600,image:"https://via.placeholder.com/300"},
+{name:"Box Fit Shirt",category:"Shirts",price:500,image:"https://via.placeholder.com/300"},
+
+{name:"Premium Hoodie Black",category:"Tops",price:850,image:"https://via.placeholder.com/300"},
+{name:"Premium Hoodie Grey",category:"Tops",price:850,image:"https://via.placeholder.com/300"},
+{name:"Zip Hoodie",category:"Tops",price:900,image:"https://via.placeholder.com/300"},
+{name:"Street Sweater",category:"Tops",price:650,image:"https://via.placeholder.com/300"},
+{name:"Oversized Sweatshirt",category:"Tops",price:700,image:"https://via.placeholder.com/300"},
+{name:"Crop Top Summer",category:"Tops",price:380,image:"https://via.placeholder.com/300"},
+
+{name:"Cargo Pants Black",category:"Pants",price:750,image:"https://via.placeholder.com/300"},
+{name:"Cargo Pants Beige",category:"Pants",price:750,image:"https://via.placeholder.com/300"},
+{name:"Slim Fit Jeans",category:"Pants",price:650,image:"https://via.placeholder.com/300"},
+{name:"Ripped Jeans",category:"Pants",price:700,image:"https://via.placeholder.com/300"},
+{name:"Track Pants Black",category:"Pants",price:600,image:"https://via.placeholder.com/300"},
+{name:"Track Pants Grey",category:"Pants",price:600,image:"https://via.placeholder.com/300"},
+
+{name:"Denim Shorts Blue",category:"Shorts",price:420,image:"https://via.placeholder.com/300"},
+{name:"Denim Shorts Black",category:"Shorts",price:420,image:"https://via.placeholder.com/300"},
+{name:"Sport Shorts",category:"Shorts",price:380,image:"https://via.placeholder.com/300"},
+{name:"Gym Shorts",category:"Shorts",price:350,image:"https://via.placeholder.com/300"},
+{name:"Beach Shorts",category:"Shorts",price:300,image:"https://via.placeholder.com/300"},
+
+{name:"Classic Cap Black",category:"Caps",price:250,image:"https://via.placeholder.com/300"},
+{name:"Classic Cap White",category:"Caps",price:250,image:"https://via.placeholder.com/300"},
+{name:"Premium Bucket Hat",category:"Caps",price:320,image:"https://via.placeholder.com/300"},
+{name:"Street Beanie",category:"Caps",price:220,image:"https://via.placeholder.com/300"},
+{name:"Street Beanie Grey",category:"Caps",price:220,image:"https://via.placeholder.com/300"},
+
+{name:"Gold Chain Thick",category:"Accessories",price:250,image:"https://via.placeholder.com/300"},
+{name:"Gold Chain Thin",category:"Accessories",price:200,image:"https://via.placeholder.com/300"},
+{name:"Silver Chain",category:"Accessories",price:230,image:"https://via.placeholder.com/300"},
+{name:"Premium Sunglasses",category:"Accessories",price:500,image:"https://via.placeholder.com/300"},
+{name:"Bracelet Set",category:"Accessories",price:180,image:"https://via.placeholder.com/300"},
+{name:"Magnetic Earrings",category:"Accessories",price:150,image:"https://via.placeholder.com/300"}
+
+];
+
+/* ================= DISPLAY ================= */
+
+function displayProducts(list){
+
+let container=document.getElementById("products");
+container.innerHTML="";
+
+list.forEach((product,index)=>{
+
+container.innerHTML+=`
+<div class="product">
+<img src="${product.image}">
+<h3>${product.name}</h3>
+<p>R${product.price}</p>
+
+<label>Qty</label>
+<input type="number" min="1" value="1" id="qty${index}">
+
+<button onclick="addToCart('${product.name}',${product.price},document.getElementById('qty${index}').value)">
+Add To Cart
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+displayProducts(products);
+
+function filterProducts(cat){
+if(cat==="All"){
+displayProducts(products);
+}else{
+displayProducts(products.filter(p=>p.category===cat));
+}
+}
+
+/* ================= FILTER TOGGLE ================= */
+
+function toggleFilters(){
+let box=document.getElementById("filterBox");
+box.classList.toggle("hidden");
+}
+
+/* ================= CART ================= */
+
+function addToCart(name,price,qty){
+
+qty=parseInt(qty);
+
+let existing=cart.find(i=>i.name===name);
+
+if(existing){
+existing.qty+=qty;
+}else{
+cart.push({name,price,qty});
+}
+
+localStorage.setItem("cart",JSON.stringify(cart));
+updateCart();
+alert("Added ✅");
+
+}
+
+function updateCart(){
+document.getElementById("cartCount").innerText=cart.length;
+}
+
+updateCart();
+
+function openCart(){
+document.getElementById("cartModal").style.display="block";
+renderCart();
+}
+
+function closeCart(){
+document.getElementById("cartModal").style.display="none";
+}
+
+function renderCart(){
+
+let div=document.getElementById("cartItems");
+div.innerHTML="";
+let total=0;
+
+cart.forEach((item,index)=>{
+let sub=item.price*item.qty;
+total+=sub;
+
+div.innerHTML+=`
+<div>
+<strong>${item.name}</strong><br>
+Qty: ${item.qty}<br>
+Subtotal: R${sub}
+<button class="remove" onclick="removeItem(${index})">Remove</button>
+</div>
+<hr>
+`;
+
+});
+
+document.getElementById("total").innerText=total+shipping;
+
+}
+
+function removeItem(index){
+cart.splice(index,1);
+localStorage.setItem("cart",JSON.stringify(cart));
+renderCart();
+updateCart();
+}
+
+/* ================= PAYMENT ================= */
+
+function payNow(){
+
+let name=document.getElementById("name").value;
+let phone=document.getElementById("phone").value;
+let address=document.getElementById("address").value;
+
+if(!name||!phone||!address){
+alert("Fill details");
+return;
+}
+
+let total=document.getElementById("total").innerText;
+
+let payfastUrl="https://www.payfast.co.za/eng/process?"+
+"merchant_id=YOUR_MERCHANT_ID"+
+"&merchant_key=YOUR_MERCHANT_KEY"+
+"&amount="+total+
+"&item_name=KD_STORE_ORDER";
+
+window.location.href=payfastUrl;
+
+setTimeout(()=>{
+
+let message="Order Paid%0AName:"+name+
+"%0APhone:"+phone+
+"%0AAddress:"+address+
+"%0ATotal:R"+total;
+
+let whatsapp="https://api.whatsapp.com/send?phone=YOUR_NUMBER&text="+message;
+
+window.open(whatsapp,"_blank");
+
+localStorage.removeItem("cart");
+cart=[];
+updateCart();
+
+},5000);
+
+}
+
+</script>
+<a href="HOME.html">
+<button style="
+background:gold;
+color:black;
+border:none;
+padding:6px 15px;
+border-radius:20px;
+font-weight:700;
+cursor:pointer;
+">
+⬅ Back Home
+</button>
+
+
+</a>
+</body>
+</html>
